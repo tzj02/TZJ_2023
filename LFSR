@@ -1,1 +1,55 @@
+module LFSR_15 (
+    input           clk     ,
+    input           rst_n   ,
+    input   [14:0]   seed    ,//种子值
+    input           start   ,
+
+    output  [14:0]   dout    ,//输出计数值
+    output          dout_vld ,//当计数值计到种子值时，拉高
+    output   [1:0]   dout_2  
+);
+
+
+//信号定义
+
+    reg     [14:0]       cnt         ;//count
+    wire                xor_bit     ;
+
+    reg                 start_r     ;
+    wire                start_pedge ;
+    reg                 num;
+    initial             num = 0;
+    always @(negedge clk or negedge rst_n)begin 
+        if(rst_n)begin
+            start_r <= 0;
+        end 
+//        else begin 
+//            start_r <= start;
+//        end 
+    end
+
+    assign start_pedge = start & ~start_r;//检测start的上升沿 上升沿有效时，加载种子值给计数器
+
+    always @(negedge clk or negedge rst_n)begin //上升沿之后，当计数器使能时，产生数据输出
+      if (num==0)begin
+        if(!rst_n)begin
+            cnt <= 0;
+        end 
+        else if(start_pedge)begin //检测到起始信号上升沿时，加载种子值
+            cnt <= seed;
+        end 
+        else if(start_r)begin 
+            cnt <= {cnt[13:0],xor_bit};
+        end 
+        num = num+1;
+      end  
+    end
+
+    assign xor_bit = cnt[14]^cnt[13];
+    
+    //输出
+    assign dout = cnt;
+    assign dout_vld = start_r && cnt == seed;
+    assign dout_2 = cnt[10:9];
+endmodule
 
