@@ -1,0 +1,64 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2023/04/19 20:00:51
+// Design Name: 
+// Module Name: zd_mod_tb
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+`timescale 1ns/1ps  //定义时间尺度
+                
+module zd_mod_tb();
+//激励信号定义 
+reg				clk  	;
+reg             rst_n;
+
+//输出信号定义	 
+wire            out_top;
+wire            [1:0]out_lf;
+reg             start;
+reg             [14:0]seed 	;                                          
+//时钟周期参数定义					        
+    parameter		CLOCK_CYCLE = 20;    
+                                
+top top_1(
+    .clk(clk),
+    .rst_n(rst_n),
+    .start(start),
+    .seed(seed),
+    .out_top(out_top),
+    .out_lf(out_lf)
+);
+
+
+//产生时钟							       		
+initial 		clk = 1'b1;		
+initial  begin						       		
+    rst_n = 1'b0;								
+    seed = 0;
+    start = 0;							
+    #(CLOCK_CYCLE*20);				            
+    rst_n = 1'b1;								
+    seed = 15'b100111111111111;
+    start = 1'b1;
+    $stop; 	  
+end           		
+always #(CLOCK_CYCLE*500) clk = ~clk;  		
+                                                   
+//产生激励							       										       	
+endmodule
+
